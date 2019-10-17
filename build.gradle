@@ -1,0 +1,52 @@
+/*
+ * Copyright (c) 2018 Grid Dynamics International, Inc.
+ * All Rights Reserved http://www.griddynamics.com
+ *
+ * Classification level: PUBLIC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @Description: Open source semantic search blueprint
+ */
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.elasticsearch.gradle:build-tools:6.7.2"
+    }
+}
+group 'com.griddynamics.elasticsearch.plugins'
+version '0.0.1-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'custom-usermonitoring'
+
+esplugin {
+    name 'custom-usermonitoring'
+    description 'Elasticsearch plugin for limit user search requests'
+    classname 'com.griddynamics.elasticsearch.plugins.usermonitoring.CustomSlowlogPlugin'
+    licenseFile rootProject.file('LICENSE.txt')
+    noticeFile rootProject.file('NOTICE.txt')
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compileOnly 'org.elasticsearch:elasticsearch:6.7.2'
+    compileOnly "org.elasticsearch.plugin:x-pack-core:6.7.2"
+}
