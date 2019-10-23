@@ -1,4 +1,4 @@
-package com.griddynamics.elasticsearch.plugins.usermonitoring;
+package com.griddynamics.elasticsearch.plugin.usermonitoring.consumption;
 
 public class DataCollectionException extends RuntimeException {
     public DataCollectionException(String msg) {

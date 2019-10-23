@@ -1,14 +1,15 @@
-package com.griddynamics.elasticsearch.plugins.usermonitoring;
+package com.griddynamics.elasticsearch.plugin.usermonitoring.consumption;
 
 import org.elasticsearch.index.shard.ShardId;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class UserData {
     private final Map<ShardId, Long> indexShardTime = new HashMap<>(); //TODO precalculate size
 
+    public UserData() {
+    }
 
     public UserData(ShardId shardId, long tookInNanos) {
         indexShardTime.put(shardId, tookInNanos);

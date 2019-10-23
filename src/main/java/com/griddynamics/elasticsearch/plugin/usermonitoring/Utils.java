@@ -1,6 +1,7 @@
-package com.griddynamics.elasticsearch.plugins.usermonitoring;
+package com.griddynamics.elasticsearch.plugin.usermonitoring;
 
 import org.elasticsearch.common.util.concurrent.ThreadContext;
+import org.elasticsearch.common.util.set.Sets;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
 import org.elasticsearch.xpack.core.security.user.User;
 
@@ -8,6 +9,7 @@ import java.lang.reflect.*;
 import java.security.Permission;
 import java.security.PrivilegedAction;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -29,6 +31,10 @@ public class Utils {
             user = auth.getUser();
         }
         return user;
+    }
+    static final Set<String> SYSTEM_USERS = Sets.newHashSet("_xpack", "_xpack_security"); //TODO property
+    public static boolean isSystemUser(User user) {
+        return user != null && SYSTEM_USERS.contains(user.principal());
     }
 
     @SuppressWarnings("unchecked")
