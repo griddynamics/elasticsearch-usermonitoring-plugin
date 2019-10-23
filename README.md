@@ -37,17 +37,31 @@ This plugin has to be installed on DATA nodes.
 ####Properties (default values)
 To elasticsearch.yml
 ```
-plugin.custom:
-  usermonitoring:
+plugin.custom.usermonitoring:
     enabled: true
-    interval.seconds: 60
-    skip:
-      zerotime: true
-      users:
-        - "x_pack"
-        - "_xpack_security"
-      indicies.prefix:
-        - "."
+    slowlog:
+      enabled: true
+      append.roles: false
+    request.limiter:
+      enabled: true
+      ratelimit:
+        enabled: true  ##Enable\disable requests rate limit per user
+        permitsPerSecond: 2  ##Count of requests which user can do per second
+        waintingTimeSec: 30 ##In case of lock waiting time will be more this value, request fast fail 
+      parallel:
+        max: 10  ##If the user will have this value of concurrent requests at the same time, then the next request will be rejected 
+        warn: 7  ##If the user will have more than this value of concurrent requests at the same time, then information about this activity will be added to log
+
+    consumption:
+      enabled: true
+      interval.seconds: 60
+      skip:
+        zerotime: true
+          users:
+            - "x_pack"
+            - "_xpack_security"
+          indicies.prefix:
+            - "."
 ```
 
 Logging properties:

@@ -49,7 +49,7 @@ public class UserConsumptionFeature extends AbstractFeature {
 
 
     public UserConsumptionFeature(String mainPrefix, Settings settings) {
-        super(mainPrefix + "consumers", settings);
+        super(mainPrefix + "consumption", settings);
         this.configuration = new UserConsumptionConfiguration(getSettingsPrefix(), settings);
 
     }
@@ -58,9 +58,11 @@ public class UserConsumptionFeature extends AbstractFeature {
 
         dataCollector.set(new DataCollector(threadPool.getThreadContext(), configuration));
         userDataConsumers.add(new UserDataLoggerService(configuration));
-        threadPool.scheduleWithFixedDelay(this::consume, TimeValue.timeValueSeconds(
-                configuration.getConsumingIntervalSeconds()
-        ), THREAD_POOL_NAME);
+        if (isEnabled()) {
+            threadPool.scheduleWithFixedDelay(this::consume, TimeValue.timeValueSeconds(
+                    configuration.getConsumingIntervalSeconds()
+            ), THREAD_POOL_NAME);
+        }
     }
 
 
@@ -76,9 +78,11 @@ public class UserConsumptionFeature extends AbstractFeature {
     }
 
     public void acceptIndexModule(IndexModule indexModule) {
-        String name = indexModule.getIndex().getName();
-        if (!hasPrefix(name)) {
-            indexModule.addSearchOperationListener(dataCollector.get());
+        if (isEnabled()) {
+            String name = indexModule.getIndex().getName();
+            if (!hasPrefix(name)) {
+                indexModule.addSearchOperationListener(dataCollector.get());
+            }
         }
     }
 

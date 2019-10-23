@@ -60,10 +60,12 @@ public class SlowLogFeature extends AbstractFeature {
     }
 
     public void acceptIndexModule(IndexModule indexModule) {
-        IndexSettings indexSettings = extract("indexSettings", IndexSettings.class, indexModule);
-        boolean success = removeStandardSlowlog(indexModule);
-        CustomSearchSlowLog listener = new CustomSearchSlowLog(indexSettings, threadContext.get(), success, appendRolesValue);
-        indexModule.addSearchOperationListener(listener);
+        if (isEnabled()) {
+            IndexSettings indexSettings = extract("indexSettings", IndexSettings.class, indexModule);
+            boolean success = removeStandardSlowlog(indexModule);
+            CustomSearchSlowLog listener = new CustomSearchSlowLog(indexSettings, threadContext.get(), success, appendRolesValue);
+            indexModule.addSearchOperationListener(listener);
+        }
     }
 
     private boolean removeStandardSlowlog(IndexModule indexModule) {

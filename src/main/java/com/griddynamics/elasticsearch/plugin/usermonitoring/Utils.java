@@ -24,6 +24,8 @@ public class Utils {
 
     private static final String AUTH_THREAD_CONTEXT_KEY = "_xpack_security_authentication";
 
+    private static final Set<String> SYSTEM_USERS = Sets.newHashSet("_xpack", "_xpack_security"); //TODO property
+
     public static User extractUser(ThreadContext threadContext) {
         User user = null;
         Authentication auth = threadContext.getTransient(AUTH_THREAD_CONTEXT_KEY);
@@ -32,7 +34,7 @@ public class Utils {
         }
         return user;
     }
-    static final Set<String> SYSTEM_USERS = Sets.newHashSet("_xpack", "_xpack_security"); //TODO property
+
     public static boolean isSystemUser(User user) {
         return user != null && SYSTEM_USERS.contains(user.principal());
     }
