@@ -2,7 +2,6 @@
 
 PUT /_template/user_monitoring
 {
-  "user_monitoring" : {
     "order" : 10,
     "index_patterns" : [
       "usermonitoring-*"
@@ -49,10 +48,7 @@ PUT /_template/user_monitoring
       }
     },
     "aliases" : { }
-  }
 }
-
-
 
 
 

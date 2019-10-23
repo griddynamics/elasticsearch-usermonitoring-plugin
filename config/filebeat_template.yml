@@ -1,0 +1,19 @@
+filebeat:
+  inputs:
+    - type: log
+      enabled: true
+      paths:
+        - ##Path to files for example: "/usr/share/elasticsearch/logs/*"
+output:
+  elasticsearch:
+    enabled: true
+    pipeline: user_monitoring
+    index: usermonitoring-%{+yyyy.MM}
+    ##Configuration of elastic hosts\access
+    #hosts: ["https://localhost:9200"]
+    #username:
+    #password:
+    #ssl.verificationMode: certificate
+    #ssl.certificate_authorities:
+    #ssl.certificate:
+    #ssl.key:

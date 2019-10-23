@@ -1,67 +1,85 @@
 Custom-usermonitoring plugin for elasticsearch
 ================================
 
-##How to install plugin
+## How to install plugin
 First build the plugin. May be built both with Maven and Gradle. Maven requires java 8, but Gradle 
 requires java 11.
-###Instructions for Maven
+### Instructions for Maven
 1. From plugin root: 
 `mvn clean install`
-2. Ensure that `custom-usermonitoring-0.0.1-SNAPSHOT.zip` was generated in `{plugin_root}/target/releases`
+2. Ensure that `custom-usermonitoring-1.0.0-SNAPSHOT.zip` was generated in `{plugin_root}/target/releases`
 3. Change directory to `{elasticsearch_root}/bin`
 4. Remove explain plugin if it was previously installed:
 `./elasticsearch-plugin remove custom-usermonitoring`
 5. Install plugin:
-`./elasticsearch-plugin install -b file:{plugin_root}/target/releases/custom-usermonitoring-0.0.1-SNAPSHOT.zip`
+`./elasticsearch-plugin install -b file:{plugin_root}/target/releases/custom-usermonitoring-1.0.0-SNAPSHOT.zip`
 6. Run elasticsearch:
 `./elasticsearch`
 
-###Instructions for Gradle
+### Instructions for Gradle
 1. From plugin root: 
 `gradle clean build -x integTestRunner -x test`
-2. Ensure that `custom-usermonitoring-0.0.1-SNAPSHOT.zip` was generated in `{plugin_root}/build/distributions`
+2. Ensure that `custom-usermonitoring-1.0.0-SNAPSHOT.zip` was generated in `{plugin_root}/build/distributions`
 3. Change directory to `{elasticsearch_root}/bin`
 4. Remove explain plugin if it was previously installed:
 `./elasticsearch-plugin remove custom-usermonitoring`
 5. Install plugin:
-`./elasticsearch-plugin install -b file:{plugin_root}/build/distributions/custom-usermonitoring-0.0.1-SNAPSHOT.zip`
+`./elasticsearch-plugin install -b file:{plugin_root}/build/distributions/custom-usermonitoring-1.0.0-SNAPSHOT.zip`
 6. Run elasticsearch:
 `./elasticsearch`
 
 
 
-#####Description
-This plugin print information about how many CPU time consumed user for query by some period of time.
-This plugin has to be installed on DATA nodes.
+##### Description
+This plugin has 3 features:
+###### Slowlog
+This plugin is complete replacement of standard elasticsearch slowlog functionality with additional feature - information about username of query initiator.
+Optionally you can append information about user roles by property `plugin.custom.usermonitoring.slowlog.append.roles` (Default: `false`).
+All configurations are the like in default Slowlog functionality.
 
-####Properties (default values)
+###### Request Limiter
+This plugin responsible for limit of rate and parallel request per user.
+All configurations are per user. This limiter works only per node, not for the whole cluster. Limitations work only with authorized users on Get\Search requests to non-system indices.
+
+###### Consumption
+This plugin collect information about how many CPU time consumed user for query by some period of time and print it to logger(file).
+
+In addition you can install Kibana dashboard for monitoring user activity and consumed CPU time.
+You have to:
+1. Enable `consumption` feature and configure log4j2.properties to print logs to separate file
+2. Add usermonitoring template mapping from `config/commands.txt` file
+3. Add user_monitoring ingest pipeline from `config/commands.txt` file
+4. Install filebeat on each DATA node, configure it with `config/filebeat_template.yml`
+5. Import `config/kibana_dashboard.json` to Kibana (`Management->Saved Objects->Import`)
+
+#### Properties (default values)
 To elasticsearch.yml
 ```
 plugin.custom.usermonitoring:
     enabled: true
     slowlog:
       enabled: true
-      append.roles: false
+      append.roles: false ##Ability appned also information about user roles
     request.limiter:
       enabled: true
       ratelimit:
         enabled: true  ##Enable\disable requests rate limit per user
         permitsPerSecond: 2  ##Count of requests which user can do per second
-        waintingTimeSec: 30 ##In case of lock waiting time will be more this value, request fast fail 
+        waitingTimeSec: 30 ##When per user request rate is exceeded, new incoming queries are enqueued. This configuration sets up the time a query can wait in the queue before it is discarded 
       parallel:
         max: 10  ##If the user will have this value of concurrent requests at the same time, then the next request will be rejected 
         warn: 7  ##If the user will have more than this value of concurrent requests at the same time, then information about this activity will be added to log
 
     consumption:
       enabled: true
-      interval.seconds: 60
+      interval.seconds: 60 ##Printing interval
       skip:
-        zerotime: true
-          users:
-            - "x_pack"
-            - "_xpack_security"
-          indicies.prefix:
-            - "."
+        zerotime: true ##Skip printing user if consumed time < 1ms
+        users:  ##Users which should not be analyzed
+          - "x_pack"
+          - "_xpack_security"
+        indicies.prefix:
+          - "." ##Indices which has to be ignored (Default: system indices)
 ```
 
 Logging properties:
@@ -85,7 +103,7 @@ logger.user_monitoring_rolling.appenderRef.user_monitoring_rolling.ref = user_mo
 logger.user_monitoring_rolling.additivity = false
 ```
 
-######Example output:
+###### Example output:
 ```
 [2019-10-08T17:18:05,237][INFO ][custom.usermonitoring.logger] [esd2] User[elastic] consumed [376]ms
 [2019-10-08T17:18:15,288][INFO ][custom.usermonitoring.logger] [esd2] User[elastic] consumed [115]ms
