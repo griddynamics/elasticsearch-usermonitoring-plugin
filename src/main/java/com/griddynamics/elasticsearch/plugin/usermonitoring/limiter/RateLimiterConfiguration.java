@@ -24,7 +24,7 @@ public class RateLimiterConfiguration {
         rateLimitEnable = rateLimitEnabledSetting.get(settings);
         rateLimitValueSetting = Setting.doubleSetting(prefix + "ratelimit.permitsPerSecond", 2d, 0d, Setting.Property.NodeScope);
         rateLimitValue = rateLimitValueSetting.get(settings);
-        rateLimitWaitingTimeSetting = Setting.intSetting(prefix + "ratelimit.waintingTimeSec", 30, 0, Setting.Property.NodeScope);
+        rateLimitWaitingTimeSetting = Setting.intSetting(prefix + "ratelimit.waitingTimeSec", 30, 0, Setting.Property.NodeScope);
         rateLimitWaitingTimeSec = rateLimitWaitingTimeSetting.get(settings);
         maximumParallelSetting = Setting.intSetting(prefix + "parallel.max", 10, 1, Setting.Property.NodeScope);
         maxParallel = maximumParallelSetting.get(settings);

@@ -1,0 +1,186 @@
+//////Index template
+
+PUT /_template/user_monitoring
+{
+  "user_monitoring" : {
+    "order" : 10,
+    "index_patterns" : [
+      "usermonitoring-*"
+    ],
+    "settings" : {
+      "index" : {
+        "number_of_shards" : "2",
+        "number_of_replicas" : "1"
+      }
+    },
+    "mappings" : {
+      "doc" : {
+        "properties" : {
+          "@timestamp" : {
+            "type" : "date"
+          },
+          "offset" : {
+            "index" : false,
+            "type" : "long"
+          },
+          "log" : {
+            "type" : "object",
+            "properties" : {
+              "timestamp" : {
+                "type" : "date"
+              }
+            }
+          },
+          "user" : {
+            "type" : "object",
+            "properties" : {
+              "name" : {
+                "type" : "keyword"
+              },
+              "index" : {
+                "type" : "keyword"
+              },
+              "time" : {
+                "type" : "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "aliases" : { }
+  }
+}
+
+
+
+
+
+//////Pipeline
+PUT _ingest/pipeline/user_monitoring
+{
+    "description" : "parse usermonitoring message",
+    "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "pattern_definitions": {
+                    "INDEXNAME": "[a-zA-Z0-9_.-]*"
+                },
+                "patterns": [
+                    "\\[%{TIMESTAMP_ISO8601:log.timestamp}\\]\\[%{WORD:log.level}(%{SPACE})?\\]\\[%{DATA:log.logger}\\]%{SPACE}\\[%{WORD:log.node}\\](%{SPACE})?User\\[%{WORD:user.name}\\] consumed \\[%{NUMBER:user.time:int}\\]ms for index\\[%{INDEXNAME:user.index}\\]"
+                ]
+      }
+    },
+    {
+      "remove": {
+         "field": ["message", "beat", "input", "source", "prospector", "host"]
+      }
+    }
+  ]
+}
+
+
+
+////Testing and debugging pipeline
+POST _ingest/pipeline/_simulate
+{
+  "pipeline" :
+  {
+    "description" : "parse message",
+    "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "pattern_definitions": {
+                    "INDEXNAME": "[a-zA-Z0-9_.-]*"
+                },
+                "patterns": [
+                    "\\[%{TIMESTAMP_ISO8601:log.timestamp}\\]\\[%{WORD:log.level}(%{SPACE})?\\]\\[%{DATA:log.logger}\\]%{SPACE}\\[%{WORD:log.node}\\](%{SPACE})?User\\[%{WORD:user.name}\\] consumed \\[%{NUMBER:user.time:int}\\]ms for index\\[%{INDEXNAME:user.index}\\]"
+                ]
+      }
+    },
+    {
+      "remove": {
+         "field": ["message", "beat", "input", "source", "prospector", "host"]
+      }
+    }
+  ]
+  },
+  "docs": [
+    {
+  "_index": "usermonitoring-2019.10.16",
+  "_type": "doc",
+  "_id": "RZJm1W0BQEB0B7yGWRkf",
+  "_score": 1,
+  "_source": {
+    "@timestamp": "2019-10-16T16:28:36.533Z",
+    "source": "/usr/share/elasticsearch/logs/esd1_user_monitoring.log",
+    "offset": 1943,
+    "log": {
+      "file": {
+        "path": "/usr/share/elasticsearch/logs/esd1_user_monitoring.log"
+      }
+    },
+    "input": {
+      "type": "log"
+    },
+    "prospector": {
+      "type": "log"
+    },
+    "host": {
+      "name": "f5a5c489e4eb"
+    },
+    "beat": {
+      "name": "f5a5c489e4eb",
+      "hostname": "f5a5c489e4eb"
+    },
+    "message": "[2019-10-16T16:28:31,093][INFO ][custom.usermonitoring.logger] [esd1] User[elastic] consumed [1]ms for index[usermonitoring-2019.10.16]"
+  },
+  "fields": {
+    "@timestamp": [
+      "2019-10-16T16:28:36.533Z"
+    ]
+  }
+},
+    {
+  "_index": "usermonitoring-2019.10.16",
+  "_type": "doc",
+  "_id": "9pJh1W0BQEB0B7yGshbx",
+  "_score": null,
+  "_source": {
+    "@timestamp": "2019-10-16T16:23:31.846Z",
+    "host": {
+      "name": "f5a5c489e4eb"
+    },
+    "source": "/usr/share/elasticsearch/logs/esd1_user_monitoring.log",
+    "offset": 1806,
+    "log": {
+      "file": {
+        "path": "/usr/share/elasticsearch/logs/esd1_user_monitoring.log"
+      }
+    },
+    "message": "[2019-10-16T16:23:31,392][INFO ][custom.usermonitoring.logger] [esd1] User[elastic] consumed [2]ms for index[kibana_sample_data_flights]",
+    "prospector": {
+      "type": "log"
+    },
+    "input": {
+      "type": "log"
+    },
+    "beat": {
+      "name": "f5a5c489e4eb",
+      "hostname": "f5a5c489e4eb",
+      "version": "6.7.2"
+    }
+  },
+  "fields": {
+    "@timestamp": [
+      "2019-10-16T16:23:31.846Z"
+    ]
+  },
+  "sort": [
+    1571243011846
+  ]
+}
+  ]
+}

@@ -6,7 +6,7 @@
 
     <groupId>com.griddynamics.elasticsearch.plugins</groupId>
     <artifactId>custom-usermonitoring</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <description>Elasticsearch plugin for limit user search requests</description>
 
     <properties>
