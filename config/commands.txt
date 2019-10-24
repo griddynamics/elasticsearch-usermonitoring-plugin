@@ -34,10 +34,12 @@ PUT /_template/user_monitoring
             "type" : "object",
             "properties" : {
               "name" : {
-                "type" : "keyword"
+                "type" : "keyword",
+                "norms": false
               },
               "index" : {
-                "type" : "keyword"
+                "type" : "keyword",
+                "norms": false
               },
               "time" : {
                 "type" : "integer"
@@ -122,7 +124,7 @@ POST _ingest/pipeline/_simulate
       "type": "log"
     },
     "prospector": {
-      "type": "log"
+      "type": "log" 
     },
     "host": {
       "name": "f5a5c489e4eb"
