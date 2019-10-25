@@ -1,5 +1,6 @@
 Custom-usermonitoring plugin for elasticsearch
 ================================
+![](https://raw.githubusercontent.com/griddynamics/elasticsearch-usermonitoring-plugin/master/config/img/gd.png)
 ## Contents
 - [How to install plugin](#how-to-install-plugin)
     - [Instructions for Maven](#instructions-for-maven)
@@ -14,8 +15,10 @@ Custom-usermonitoring plugin for elasticsearch
     
     
 ## How to install plugin
-First build the plugin. May be built both with Maven and Gradle. Maven requires java 8, but Gradle 
-requires java 11.
+First build the plugin. Minimum requirements:
+- Java >= 1.8
+- Apache Maven >= 3.3
+
 ### Instructions for Maven
 1. From plugin root: 
 `mvn clean install`
@@ -27,19 +30,6 @@ requires java 11.
 `./elasticsearch-plugin install -b file:{plugin_root}/target/releases/custom-usermonitoring-1.0.0-SNAPSHOT.zip`
 6. Run elasticsearch:
 `./elasticsearch`
-
-### Instructions for Gradle
-1. From plugin root: 
-`gradle clean build -x integTestRunner -x test`
-2. Ensure that `custom-usermonitoring-1.0.0-SNAPSHOT.zip` was generated in `{plugin_root}/build/distributions`
-3. Change directory to `{elasticsearch_root}/bin`
-4. Remove explain plugin if it was previously installed:
-`./elasticsearch-plugin remove custom-usermonitoring`
-5. Install plugin:
-`./elasticsearch-plugin install -b file:{plugin_root}/build/distributions/custom-usermonitoring-1.0.0-SNAPSHOT.zip`
-6. Run elasticsearch:
-`./elasticsearch`
-
 
 
 ### Functionality
@@ -126,7 +116,7 @@ logger.user_monitoring_rolling.additivity = false
 [2019-10-08T17:18:05,237][INFO ][custom.usermonitoring.logger] [esd2] User[elastic] consumed [376]ms for index[index1-2019]
 [2019-10-08T17:18:15,288][INFO ][custom.usermonitoring.logger] [esd2] User[elastic] consumed [115]ms for index[index2-2019]
 ```
-![Dashboard screenshot](https://raw.githubusercontent.com/griddynamics/elasticsearch-usermonitoring-plugin/master/config/dashboard_example.png)
+![Dashboard screenshot](https://raw.githubusercontent.com/griddynamics/elasticsearch-usermonitoring-plugin/master/config/img/dashboard_example.png)
 
 
 #### Version compatibility
