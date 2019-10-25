@@ -1,6 +1,18 @@
 Custom-usermonitoring plugin for elasticsearch
 ================================
-
+## Contents
+- [How to install plugin](#how-to-install-plugin)
+    - [Instructions for Maven](#instructions-for-maven)
+    - [Instructions for Gradle](#instructions-for-gradle)
+- [Functionality](#functionality)
+    - [Id Aggregation Filter](#id-aggregation-filter)
+    - [Slowlog](#slowlog)
+    - [Request Limiter](#request-limiter)
+    - [Consumption](#consumption)
+- [Configuration](#configuration)
+- [Version compatibility](#version-compatibility)
+    
+    
 ## How to install plugin
 First build the plugin. May be built both with Maven and Gradle. Maven requires java 8, but Gradle 
 requires java 11.
@@ -30,18 +42,22 @@ requires java 11.
 
 
 
-##### Description
-This plugin has 3 features:
-###### Slowlog
+### Functionality
+This plugin has 4 features:
+#### Id Aggregation Filter
+**(Disabled by default, In Test)** 
+Doesn't make sense to do aggregation by field "_id", this can [lead to OOM](https://github.com/elastic/elasticsearch/issues/32626).
+This plugin trying to find search requests with aggregation by "_id" and returns BAD_REQUEST status. 
+#### Slowlog
 This plugin is complete replacement of standard elasticsearch slowlog functionality with additional feature - information about username of query initiator.
 Optionally you can append information about user roles by property `plugin.custom.usermonitoring.slowlog.append.roles` (Default: `false`).
 All configurations are the like in default Slowlog functionality.
 
-###### Request Limiter
+#### Request Limiter
 This plugin responsible for limit of rate and parallel request per user.
 All configurations are per user. This limiter works only per node, not for the whole cluster. Limitations work only with authorized users on Get\Search requests to non-system indices.
 
-###### Consumption
+#### Consumption
 This plugin collect information about how many CPU time consumed user for query by some period of time and print it to logger(file).
 
 In addition you can install Kibana dashboard for monitoring user activity and consumed CPU time.
@@ -52,11 +68,13 @@ You have to:
 4. Install filebeat on each DATA node, configure it with `config/filebeat_template.yml`
 5. Import `config/kibana_dashboard.json` to Kibana (`Management->Saved Objects->Import`)
 
-#### Properties (default values)
-To elasticsearch.yml
+### Configuration 
+Default values in elasticsearch.yml
 ```
 plugin.custom.usermonitoring:
     enabled: true
+    filter.id.aggregation:
+        enabled: false ##Functionality disabled by default (In Test)
     slowlog:
       enabled: true
       append.roles: false ##Ability appned also information about user roles
@@ -103,8 +121,14 @@ logger.user_monitoring_rolling.appenderRef.user_monitoring_rolling.ref = user_mo
 logger.user_monitoring_rolling.additivity = false
 ```
 
-###### Example output:
+##### Example output:
 ```
-[2019-10-08T17:18:05,237][INFO ][custom.usermonitoring.logger] [esd2] User[elastic] consumed [376]ms
-[2019-10-08T17:18:15,288][INFO ][custom.usermonitoring.logger] [esd2] User[elastic] consumed [115]ms
+[2019-10-08T17:18:05,237][INFO ][custom.usermonitoring.logger] [esd2] User[elastic] consumed [376]ms for index[index1-2019]
+[2019-10-08T17:18:15,288][INFO ][custom.usermonitoring.logger] [esd2] User[elastic] consumed [115]ms for index[index2-2019]
 ```
+![Dashboard screenshot](https://raw.githubusercontent.com/griddynamics/elasticsearch-usermonitoring-plugin/master/config/dashboard_example.png)
+
+
+#### Version compatibility
+Current master fully compatible with 6.7 elasticsearch version (+ all minors version). 
+To build for specific minor you have to change `elasticsearch.version` property in a `pom.xml` file.

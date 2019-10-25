@@ -1,6 +1,7 @@
 package com.griddynamics.elasticsearch.plugin.usermonitoring;
 
 import com.griddynamics.elasticsearch.plugin.usermonitoring.consumption.UserConsumptionFeature;
+import com.griddynamics.elasticsearch.plugin.usermonitoring.filer.IdAggFilterFeature;
 import com.griddynamics.elasticsearch.plugin.usermonitoring.limiter.RequestLimiterFeature;
 import com.griddynamics.elasticsearch.plugin.usermonitoring.slowlog.SlowLogFeature;
 import org.elasticsearch.action.support.ActionFilter;
@@ -40,6 +41,7 @@ public class UserMonitoringPlugin extends Plugin implements ActionPlugin {
     private final SlowLogFeature slowLogFeature;
     private final RequestLimiterFeature requestLimiterFeature;
     private final UserConsumptionFeature userConsumptionFeature;
+    private final IdAggFilterFeature idAggFilterFeature;
 
 
     private List<Consumer<IndexModule>> onIndexChain = new ArrayList<>(3);
@@ -51,9 +53,8 @@ public class UserMonitoringPlugin extends Plugin implements ActionPlugin {
         this.slowLogFeature = new SlowLogFeature(MAIN_PLUGIN_SETTINGS_PREFIX, settings);
         this.requestLimiterFeature = new RequestLimiterFeature(MAIN_PLUGIN_SETTINGS_PREFIX, settings);
         this.userConsumptionFeature = new UserConsumptionFeature(MAIN_PLUGIN_SETTINGS_PREFIX, settings);
+        this.idAggFilterFeature = new IdAggFilterFeature(MAIN_PLUGIN_SETTINGS_PREFIX, settings);
 
-
-        //this.indexPrefixes.addAll(SKIP_INDICIES.get(settings));
     }
 
     @Override
@@ -100,7 +101,10 @@ public class UserMonitoringPlugin extends Plugin implements ActionPlugin {
     @Override
     public List<ActionFilter> getActionFilters() {
         if (enabled) {
-            return requestLimiterFeature.getActionFilters();
+            return Stream.of(
+                    requestLimiterFeature.getActionFilters(),
+                    idAggFilterFeature.getActionFilters()
+            ).flatMap(List::stream).collect(toList()) ;
         } else {
             return Collections.emptyList();
         }

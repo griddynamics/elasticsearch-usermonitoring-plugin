@@ -59,6 +59,7 @@ public class Utils {
         return (T) extractor.extract(extractFrom);
     }
 
+
     private static <T extends AccessibleObject & Member> boolean isAccessible(final T member) {
         Objects.requireNonNull(member, "No member provided");
         return Modifier.isPublic(member.getModifiers()) && Modifier.isPublic(member.getDeclaringClass().getModifiers());
