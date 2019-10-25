@@ -4,7 +4,6 @@ Custom-usermonitoring plugin for elasticsearch
 ## Contents
 - [How to install plugin](#how-to-install-plugin)
     - [Instructions for Maven](#instructions-for-maven)
-    - [Instructions for Gradle](#instructions-for-gradle)
 - [Functionality](#functionality)
     - [Id Aggregation Filter](#id-aggregation-filter)
     - [Slowlog](#slowlog)
